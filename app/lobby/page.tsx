@@ -1,44 +1,50 @@
 'use client'
-import React, { FormEvent, useEffect, useState } from 'react'
-import { io,Socket } from 'socket.io-client';
+import React, {  useEffect, useState } from 'react'
+import io,{ Socket } from 'socket.io-client';
 
 let socket: Socket;
 
-const Lobby = () => {
+const Lobby: React.FC = () => {
 
     const [room,setRoom] = useState<string>("");
     const [rooms,setRooms] = useState<string[]>([]);
 
-    const createRoom = (e: FormEvent<HTMLFormElement>) =>{
-        e.preventDefault()
-        const formData  = new FormData(e.currentTarget);
-        const roomName = formData.get("nameRoom") as string;
-        setRoom(roomName);        
-
-    }
 
     useEffect(()=>{
+        socket= io();      
+        //socket.emit('getRooms');
+   
+         // Listen for the room list from the server
+    socket.on('roomList', (rooms: string[]) => {
+      setRooms(rooms);
+      console.log(rooms);
+    });
 
-        socket= io();
+    // Request the room list when component loads
+    socket.emit('getRooms');
 
-        socket.emit('getRooms');
-        socket.on('roomList', (rooms: string[]) => {
-        setRooms(rooms);
-            //console.log(rooms);
-      });
 
-      if(room!=="")socket.emit("joinRoom",room);
+      return () => {
+        socket.disconnect();
+      };
 
     },[room]);
+
+
+    const createRoom = () =>{
+     socket.emit("joinRoom",room);
+      //setRoom("");
+
+  };
 
 
   return (
     <div className=''>
         List of Rooms
-        <form onSubmit={createRoom}>
-        <input className="border-l-pink-500"name="nameRoom"></input>
-        <button className="border-spacing-3 bg-red-300" type='submit'>CREATE ROOM</button>
-        </form>
+       
+        <input value={room}onChange={(e)=>setRoom(e.target.value)}className="border-l-pink-500"></input>
+        <button onClick={createRoom} className="border-spacing-3 bg-red-300" >CREATE ROOM</button>
+        
         <div>
         {rooms.map((list,index)=>(
              
