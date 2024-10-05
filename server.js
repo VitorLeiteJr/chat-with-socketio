@@ -30,6 +30,12 @@ const emitRooms = () => {
   io.emit('roomList', rooms); // Broadcast room list to all clients
 };
 
+//notify all clients when a user disconnects
+socket.on("disconnect", ()=>{
+  io.emit('userDisconnected', socket.id);
+})
+
+
 // Send the updated room list whenever a new client requests it
 socket.on('getRooms', () => {
   emitRooms(); // Send the rooms to all clients

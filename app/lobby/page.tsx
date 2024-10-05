@@ -2,6 +2,8 @@
 import React, {  FormEvent, useEffect, useState } from 'react'
 import io,{ Socket } from 'socket.io-client';
 import ModalComp from '../components/modal';
+import Link from 'next/link';
+import { toast } from 'react-toastify';
 
 let socket: Socket;
 
@@ -24,9 +26,12 @@ const Lobby: React.FC = () => {
       // Request the room list when component loads
       socket.emit('getRooms');
 
+        socket.on('userDisconnected', (userId: string)=>{
+          toast.error("User disconnected: "+userId);
+        });
 
       return () => {
-        socket.disconnect();
+         socket.disconnect();
       };
 
     },[]);
@@ -43,7 +48,6 @@ const Lobby: React.FC = () => {
     const handleModalClose = () => {
       setIsOpenModal(false);
     }
-
 
   return (
       <div>
@@ -74,12 +78,11 @@ const Lobby: React.FC = () => {
                          <div className="text-sm font-light text-gray-500">Level 6 - Warlock</div>
                        </div>
                        </div>
-                       <div>
-                         <button className="bg-red-400 hover:bg-red-500 p-2 rounded-full shadow-md flex justify-center items-center">
-                           <svg className="text-white toggle__lock w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                           </svg>
-                         </button>
+                       <div className='flex space-x-2'>
+                         
+                       <Link href={'http'}>  <button className= "bg-green-400 hover:bg-green-500 p-2 rounded-full shadow-md flex justify-center items-center">
+                            <p>JOIN</p>
+                         </button></Link>
                        </div>
                      </div>
                 ))}                
@@ -102,3 +105,4 @@ const Lobby: React.FC = () => {
 }
 
 export default Lobby
+
