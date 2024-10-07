@@ -1,38 +1,38 @@
 'use client'
 import React, { useState, useEffect } from "react";
 import io, { Socket } from "socket.io-client";
-import { socketClient } from "../_helpers/socketClient";
-
 let socket: Socket;
 
 const Chat: React.FC = () => {
+  
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<string[]>([]);
+  const [room,setRoom] = useState("test");
 
   useEffect(() => {
     // Connect to the WebSocket server
-    socket = socketClient();
+     socket= io();
 
-    //socket.emit('joinRoom', room);  
+    socket.emit("joinRoom",(room));
+
     // Listen for incoming messages, and get the message and set in array of messages
-    socket.on("receiveMessage", (newMessage: string) => {
+    socket.on("message", (newMessage: string) => {
+      //console.log(newMessage);
       setMessages((prevMessages) => [...prevMessages, newMessage]);
     });
-
-
 
     // Cleanup connection on unmount
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [room]);
 
   const sendMessage = () => {
     if (message.trim() === "") return;
-    
-    socket.emit("sendMessage", message);
+    setMessages((prevMessages) => [...prevMessages, message]);
+    socket.emit("sendMessageToRoom", {room,message});
     setMessage("");
-  };
+   };
 
   return (
     <div className="flex flex-col items-center">

@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
-const port = 3001;
+const port = 3000;
 // when using middleware `hostname` and `port` must be provided below
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
@@ -15,7 +15,7 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
- // console.log("a user connected: ",socket.id);
+  console.log("a user connected: ",socket.id);
   
  const getActiveRooms = () => {
   const rooms = [...io.sockets.adapter.rooms.keys()].filter(
@@ -30,10 +30,18 @@ const emitRooms = () => {
   io.emit('roomList', rooms); // Broadcast room list to all clients
 };
 
+
 //notify all clients when a user disconnects
 socket.on("disconnect", ()=>{
   io.emit('userDisconnected', socket.id);
-})
+  emitRooms();  
+});
+
+//send message to a specific room
+socket.on('sendMessageToRoom', ({room,message})=>{
+  console.log(room,message)
+  socket.to(room).emit('message', message);
+});
 
 
 // Send the updated room list whenever a new client requests it
@@ -49,6 +57,7 @@ socket.on('joinRoom', (room) => {
 });
 
    socket.on("sendMessage", (message)=>{
+    console.log(message);
     io.emit("receiveMessage", message);
    })
   });
