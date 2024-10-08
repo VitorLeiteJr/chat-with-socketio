@@ -2,21 +2,23 @@
 import React, {  FormEvent, useEffect, useState } from 'react'
 import io,{ Socket } from 'socket.io-client';
 import ModalComp from '../components/modal';
-import Link from 'next/link';
 import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
+import { useRoom } from '../context/RoomContext';
 
-let socket: Socket;
+  let socket: Socket;
 
 const Lobby: React.FC = () => {
 
     const [rooms,setRooms] = useState<string[]>([]);
     const [isOpenModal,setIsOpenModal]  = useState<boolean>(false);
+    const {setRoom} = useRoom();
+    const router = useRouter();
 
 
     useEffect(()=>{
         socket= io();      
         //socket.emit('getRooms');
-   
           // Listen for the room list from the server
       socket.on('roomList', (rooms: string[]) => {
         setRooms(rooms);
@@ -41,12 +43,20 @@ const Lobby: React.FC = () => {
       e.preventDefault();
       const formData = new FormData(e.currentTarget);
       const nameRoom = formData.get("roomName") as string;
-
-      socket.emit("joinRoom",nameRoom);
+      setRoom(nameRoom);
+      router.push('/chat');
   };
 
     const handleModalClose = () => {
       setIsOpenModal(false);
+    };
+    const handleJoinRoom = (nameRoom: string) => {
+      if(socket)
+
+      socket.emit("joinRoom", nameRoom);
+      setRoom(nameRoom);
+      router.push("/chat");
+      
     }
 
   return (
@@ -80,9 +90,9 @@ const Lobby: React.FC = () => {
                        </div>
                        <div className='flex space-x-2'>
                          
-                       <Link href={'http'}>  <button className= "bg-green-400 hover:bg-green-500 p-2 rounded-full shadow-md flex justify-center items-center">
+                        <button onClick={()=>handleJoinRoom(rooms)}className= "bg-green-400 hover:bg-green-500 p-2 rounded-full shadow-md flex justify-center items-center">
                             <p>JOIN</p>
-                         </button></Link>
+                         </button>
                        </div>
                      </div>
                 ))}                
