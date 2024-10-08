@@ -1,63 +1,31 @@
 'use client'
-import React, { useState, useEffect } from "react";
-import io, { Socket } from "socket.io-client";
+import React from 'react'
+import { useClientContext } from './context/ClientContext'
+import { useRouter } from 'next/navigation';
 
-let socket: Socket;
+const HomePage = () => {
 
-const Chat: React.FC = () => {
-  const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const {setName}  = useClientContext();
+  const router = useRouter();
 
-  useEffect(() => {
-    // Connect to the WebSocket server
-    socket = io();
-
-    // Listen for incoming messages
-    socket.on("receiveMessage", (newMessage: string) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
-
-    // Cleanup connection on unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  const sendMessage = () => {
-    if (message.trim() === "") return;
-
-    // Emit the message to the server
-    socket.emit("sendMessage", message);
-    setMessage("");
-  };
+  const toLobby = () => {
+    router.push('/lobby');
+  }
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="w-full max-w-md bg-gray-200 p-4 rounded-lg shadow-md">
-        <h2 className="text-lg font-bold mb-4">Real-Time Chat</h2>
-        <div className="h-64 overflow-y-auto bg-white p-2 mb-4">
-          {messages.map((msg, index) => (
-            <div key={index} className="p-2 bg-blue-100 rounded mb-2">
-              {msg}
-            </div>
-          ))}
-        </div>
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message"
-          className="w-full p-2 border rounded mb-2"
-        />
-        <button
-          onClick={sendMessage}
-          className="w-full bg-blue-500 text-white p-2 rounded"
-        >
-          Send
-        </button>
-      </div>
-    </div>
-  );
-};
+    <div className="flex min-h-screen w-full items-center justify-center bg-gray-100">
+	<div className="w-96 rounded border bg-white p-2 shadow">		
+      fill the input below with your name
+		<div className="flex items-center justify-between">
+			<input onChange={(e)=>(setName(e.target.value))}type="text" className="mr-4 w-full rounded border bg-gray-100 p-2 focus:border-blue-500 focus:outline-none"/>
 
-export default Chat;
+			<div className="flex items-center space-x-2">
+				<button onClick={toLobby}className="rounded bg-blue-500 px-10 py-2  text-white hover:bg-blue-600">join</button>
+			</div>
+		</div>
+	</div>
+</div>
+  )
+}
+
+export default HomePage
