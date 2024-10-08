@@ -38,9 +38,8 @@ socket.on("disconnect", ()=>{
 });
 
 //send message to a specific room
-socket.on('sendMessageToRoom', ({room,message})=>{
-  console.log(room,message)
-  socket.to(room).emit('message', message);
+socket.on('sendMessageToRoom', ({room,msg})=>{
+  socket.to(room).emit('message', msg);
 });
 
 

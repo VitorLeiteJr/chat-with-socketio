@@ -5,6 +5,7 @@ import ModalComp from '../components/modal';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import { useRoom } from '../context/RoomContext';
+import { useClientContext } from '../context/ClientContext';
 
   let socket: Socket;
 
@@ -13,10 +14,12 @@ const Lobby: React.FC = () => {
     const [rooms,setRooms] = useState<string[]>([]);
     const [isOpenModal,setIsOpenModal]  = useState<boolean>(false);
     const {setRoom} = useRoom();
+    const {name} = useClientContext();
     const router = useRouter();
 
 
     useEffect(()=>{
+      if(name==="") router.push("/")
         socket= io();      
         //socket.emit('getRooms');
           // Listen for the room list from the server
@@ -73,9 +76,11 @@ const Lobby: React.FC = () => {
               <div className="bg-white w-full md:max-w-4xl rounded-lg shadow">
               <div className="h-12 flex justify-between items-center border-b border-gray-200 m-4">
                 <div >
-                <div className="text-xl font-bold text-gray-700">Lobby</div>
-                <div className="text-sm font-base text-gray-500">List of rooms</div>
+                 <div className="text-xl font-bold text-gray-700">Lobby</div>
+                <div className="text-sm font-base text-gray-500 py-2">List of rooms</div>
                 </div>
+                <div className="text-xl font-bold text-gray-700">Welcome, {name}</div>
+               
               </div>
               <div className="px-6">
 

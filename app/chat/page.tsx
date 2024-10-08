@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import io, { Socket } from "socket.io-client";
 import { useRoom } from "../context/RoomContext";
 import { useRouter } from "next/navigation";
+import { useClientContext } from "../context/ClientContext";
 let socket: Socket;
 
 const Chat: React.FC = () => {
@@ -10,6 +11,7 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const [messages, setMessages] = useState<string[]>([]);
   const {room} = useRoom();
+  const {name} = useClientContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -31,9 +33,11 @@ const Chat: React.FC = () => {
   }, []);
 
   const sendMessage = () => {
-    if (message.trim() === "") return;
-    setMessages((prevMessages) => [...prevMessages, message]);
-    socket.emit("sendMessageToRoom", {room,message});
+    
+    if (message.trim() === "") return;    
+    const msg = name+": "+message;
+    setMessages((prevMessages) => [...prevMessages, msg]);
+    socket.emit("sendMessageToRoom", {room,msg});
     setMessage("");
    };
 

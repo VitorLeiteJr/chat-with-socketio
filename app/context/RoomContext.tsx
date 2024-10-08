@@ -2,6 +2,7 @@
 'use client'
 import { createContext, useState, ReactNode, useContext } from 'react';
 
+
 interface RoomContextType {
   room: string;
   setRoom: (room: string) => void;
@@ -13,8 +14,9 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
   const [room, setRoom] = useState<string>(''); // Default room name
 
   return (
+    
     <RoomContext.Provider value={{ room, setRoom }}>
-      {children}
+      {children} 
     </RoomContext.Provider>
   );
 };
